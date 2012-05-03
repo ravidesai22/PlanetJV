@@ -52,7 +52,11 @@
 
 -/ Remove un-necessary built-in code.
 
-- Try to learn more about fb app settings and how to use fb app more effectively
+- Try to learn more about fb app settings and how to use fb app more effectively.
+
+- FB changed it's App policy so change PlanetJV app according.
+
+- Make it ready to be public on 20th May 2012.
 
 
 *Functionality related:
