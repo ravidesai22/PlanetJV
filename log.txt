@@ -1,0 +1,97 @@
+
+-> from the idea first come in mind (may be in August 2011) to the september 2011.
+	
+	- Calender generate script
+	- study this script
+	- how to get Date from that script
+
+
+-> in Octomber 2011	
+	
+	- arrange this string in desired format
+	- convert it into the url
+	- find the day of selected day (it took so much time :) )
+	- only for sunday and wednesday
+
+	- deployed on herokuapp.com cloud service
+	- download the tool on Home basic for git upload and all(read deploymentproblem)
+	
+
+-> 29/11/2011
+
+	- From last two days I was trying different options like googlesites,dropbox etc,and today suddenly I just tried 		  to run old app without any changes and it works fine.Unbelivable...ureka... :) [Though notinh is magic this 		  means it'll take time to take chammges take place on heroku server and than on fb's server.] 
+
+-> 30/11/2011
+
+	- worked on UI,add some steps and all
+	- adjust the position of button,textbox and calender control
+
+-> 01/12/2011
+
+	- the functionality related TO DO 1 (bug#1) has been done now it's working fine when user selects a single 		  character date.i.e 6th oct 2011. :)
+
+-> 03/12/2011
+
+	- bug#2 found and fixed.. :)
+
+
+
+
+
+# TO DO:
+
+*Deployment related:
+
+-/ try to study fb code,and depoly the app one by one.
+
+	- first try for calender only without form tag.
+
+-/ If first one doesn't work than go for google sites for web hosting.
+
+-/ Try to decorate the page.
+
+-/ Remove un-necessary built-in code.
+
+- Try to learn more about fb app settings and how to use fb app more effectively
+
+
+*Functionality related:
+
+1-/ bug#1: add 0 when the single date selected e.g on selection of 6th oct 2011 it converts the
+  	   gurl string like 2011116,it should be 20111106.
+
+2-/ bug#2: When month has only one digit than it will create problem e.g any date from the month of February in 2011 is 	   not working properly
+
+
+
+
+# IMPORTANT LINKS:
+
+1. http://devcenter.heroku.com/articles/facebook#create_an_app
+
+2. https://developers.facebook.com/apps/238235976238545/summary?save=1
+
+3. https://young-light-7239.herokuapp.com/?state=2122614c5ceef30c4d0d19b696472e9a&code=AQD-D7hQQKcee7GVQEaGlbH8y6oRSr123JsnyrVLwo2oijTz3zxHHUec-y3whvH5yWO5x8YPgxlTSBQNkDzTjf-n9ou6-M8o7js8y8h9uu7iJSxIr6izrujauqNXcyGc4EQEdHuwo_bIQShSOw8jiVCo6SOPcu7d1SnRpcYubYeJdQp8gUzDo7X6r1Z5pH2BqzE#_=_ 
+
+
+4. https://sites.google.com/site/ravidesai1234567890/home-1
+
+5. http://soswitcher.blogspot.com/2009/05/blogger-host-javascript-file-for-free.html
+
+6. http://www.anshuldudeja.com/2009/05/where-upload-js-files-free-javascript.html
+
+7. http://www.facebook.com/apps/application.php?id=238235976238545  {application-page's direct link}
+
+8. https://young-light-7239.herokuapp.com/   {application's direct link}
+
+9. http://www.java-scripts.net/javascripts/Calendar-Popup.phtml  {Courtsy link for Calander popup javascript.}
+
+
+
+
+
+
+
+- 
+
+	
