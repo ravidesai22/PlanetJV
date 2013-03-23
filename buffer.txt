@@ -1,0 +1,136 @@
+# SymAccount :
+1. New user Registration case :
+  - createAccount.jsp
+	- processCreateAccountAction.java
+		- com.symantec.symaccount.forms.Profile.formBeanToLdapProfile()
+			- com.symantec.utils.FormUtils.trimAndConvertLatinToUTF(String)
+		-com.symantec.uamCommon.webservices.profile.ProfileDeligateImpl.createProfile(LdapProfile, boolean, String, String, String)
+		-com.symantec.uamCommon.webservices.profile.ProfileDeligateImpl.validateCreateProfileForm(LdapProfile, boolean, ValidationRules, ArrayList)
+		-com.symantec.uamCommon.validation.ValidationRules.validateCreateProfileForm(LdapProfile, boolean)
+			-com.symantec.uamCommon.validation.ValidationUtils.validateString(String, String, boolean)
+				-com.symantec.uamCommon.validation.ValidationUtils.validateStringContent(String, int, int, String, String)
+					-com.symantec.uamCommon.validation.ValidationUtils.isWithinLatin1(String)
+					
+					
+
+2. Update Account/profile case :
+	- /SymAccount/WebRoot/updateAccount.jsp
+	- /SymAccount/src/com/symantec/symaccount/actions/ProcessUpdateAccountAction.java
+		- com.symantec.symaccount.forms.Profile.formBeanToLdapProfile()
+			- com.symantec.utils.FormUtils.trimAndConvertLatinToUTF(String)
+		- com.symantec.uamCommon.webservices.profile.ProfileDeligateImpl.updateProfile(String, LdapProfile, boolean, String)
+		- com.symantec.uamCommon.validation.ValidationRules.validateUpdateProfileForm(LdapProfile, boolean, String)
+			-com.symantec.uamCommon.validation.ValidationRules.validateProfileForm(LdapProfile, String[], boolean)
+				-com.symantec.uamCommon.validation.ValidationUtils.validateString(String, String)
+					-com.symantec.uamCommon.validation.ValidationUtils.validateString(String, String, boolean)
+						-com.symantec.uamCommon.validation.ValidationUtils.validateStringContent(String, int, int, String, String)
+							-com.symantec.uamCommon.validation.ValidationUtils.isWithinUTF8(String)
+
+3. Login Page : for usename field validation
+
+	- /SymAccount/WebRoot/login.jsp
+	- 
+	%NOTE: Most of the changes are done here.
+	
+# mysymantec/rewards applications : 
+1. MySymantec CreateProfile page: Click on "Register Now" button from MySymnatec's home page
+	- It's not coming from Rewards application's page.Have to test wether it call's SymAccount's code for field validation or not.
+		- Check after changing the code at SymAccount's end wether it's same response or not.
+		- Also update company name with UTF8,and check on enroll page how it is coming.
+
+2. rewards applications -> Enroll page
+	http://licensingprograms-sbx.symantec.com/buyingprogram/toModule.do?prefix=/iclick/createContract&page=/buyingprogram/createContract/initCreate.do 
+	- /buyingprogram/j2ee-apps/buyingprogram/web-app/iclick/createContract/newAgreement.jsp
+	- com.symantec.iclick.create.actions.SetupContractRequestAction
+		- com.symantec.iclick.create.actions.CommonAction.encodeFields(ContractRequest)
+		- com.symantec.iclick.create.actions.SetupContractRequestAction.validateFields(ActionErrors, ContractRequest, Locale) 
+			//isWithinLatin1 is used here :) com.symantec.utils.FormUtils.isWithinLatin1(String)
+	-
+
+
+
+
+#SAM module :
+1. Enroll a user page.
+	-/symacctmgt/j2ee-apps/symacctmgt/web-app/createAccount/createAccount.jsp // User Management -> Enroll a user
+	-
+	%NOTE : SAM Module has a seperate system to enroll a user which requires a more attention for UTF-8 changes
+		e.g. refer demouser1@symantec.com user's profile.
+		
+2. Update a user page.
+							
+* Useful links :
+----------------------------
+
+1. Complete Character List for UTF-8 : 
+	- http://www.fileformat.info/info/charset/UTF-8/list.htm
+	- http://www.utf8-chartable.de/
+2. Difference between UTF-8 & ISO-8859-1 :
+	- http://stackoverflow.com/questions/7048745/difference-between-utf-8-and-iso-8859-1
+
+3. For testing : 
+	- http://www.columbia.edu/~fdc/utf8/
+	- http://www.cl.cam.ac.uk/~mgk25/ucs/examples/quickbrown.txt
+	- http://docwiki.cisco.com/wiki/Non-UTF-8_characters_needed_for_some_languages  // NON UTF-8 Characters
+	
+4. isWithinUTF8 code : http://www.coderanch.com/t/504267/java/java/validate-file-UTF-encoding
+
+
+
+
+
+* Notes :
+------------------------------
+
+- UTF-8 is a multibyte encoding that can represent any Unicode character.
+   ISO 8859-1 is a single-byte encoding that can represent the first 256 Unicode characters. Both encode ASCII exactly the same way.
+  
+- Test string : 
+		- Valid UTF : 愛佳愛子
+					    ઇનપુટ સાધનોને
+		
+		- Invalid UTF : çéñ			// Reference : http://docwiki.cisco.com/wiki/Non-UTF-8_characters_needed_for_some_languages
+
+				
+- ç,é or ñ. 
+- AIKA (愛佳)	AIKO (愛子)
+- çéñçéñ
+
+- ISO-LATIN-1 Characters : 
+			
+	¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑ
+	ÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ
+
+	** Normal routine characters like a-z,A-Z,0-9 are not included.
+	For full list of characters : http://cloford.com/resources/charcodes/isolatin1.htm
+	
+- The UTF-8 characters will be accepted for following fields : // as per SymAccount_UTF-8_Support_v1.xls 
+	1. first name, -
+	2. last name,  -
+   *3. password,  - UTF-8 already but supporting printable ASCII only under SPECIAL_RULES_PASSWORD_COMPLEXITY
+	4. company name, -
+	5. address1, -
+	6. address2, -
+	7. address3, -
+	8. city, -
+	9. state  -
+
+- *Fields that are currently supports UTF-8 charset,
+	-	password
+	-	password2
+	-	oldPassword
+	-	companySize
+	-	titleId
+	-	salutation
+	-	cn
+
+ 
+愛佳愛子@gmail.com
+pswtest@symantec.com
+abcd1234愛佳愛子
+
+for password special rules validation:
+- com.symantec.uamCommon.validation.ValidationUtils.validateFieldWithSpecialRules(LdapProfile, String, String)
+- com.symantec.uamCommon.password.PasswordFormatPolicy
+
+- com.symantec.uamCommon.password.PasswordValidatorTest
