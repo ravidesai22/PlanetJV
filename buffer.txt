@@ -53,7 +53,7 @@
 #SAM module :
 1. Enroll a user page.
 	-/symacctmgt/j2ee-apps/symacctmgt/web-app/createAccount/createAccount.jsp // User Management -> Enroll a user
-	-
+		- com.symantec.sam.util.ProfileBroker.convertUserAccountToLdapProfile(UserAccount, LdapProfile)
 	%NOTE : SAM Module has a seperate system to enroll a user which requires a more attention for UTF-8 changes
 		e.g. refer demouser1@symantec.com user's profile.
 		
