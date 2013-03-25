@@ -36,7 +36,7 @@
 1. MySymantec CreateProfile page: Click on "Register Now" button from MySymnatec's home page
 	- It's not coming from Rewards application's page.Have to test wether it call's SymAccount's code for field validation or not.
 		- Check after changing the code at SymAccount's end wether it's same response or not.
-		- Also update company name with UTF8,and check on enroll page how it is coming.
+		- Also update city with UTF8,and check on enroll page how it is coming.
 
 2. rewards applications -> Enroll page
 	http://licensingprograms-sbx.symantec.com/buyingprogram/toModule.do?prefix=/iclick/createContract&page=/buyingprogram/createContract/initCreate.do 
@@ -47,13 +47,26 @@
 			//isWithinLatin1 is used here :) com.symantec.utils.FormUtils.isWithinLatin1(String)
 	-
 
-
+	%NOTE : 
+		- Currently Company Name doesn't throw any "...contains special caharaters..." error, but address filds does.
+		- Try to find out where this class methoda are used, as it contains isWithinLatin method: com.symantec.portal.util.ValidationUtils
 
 
 #SAM module :
 1. Enroll a user page.
 	-/symacctmgt/j2ee-apps/symacctmgt/web-app/createAccount/createAccount.jsp // User Management -> Enroll a user
+	-/symacctmgt/j2ee-apps/symacctmgt/src/com/symantec/sam/createAccount/actions/CreateAccountAction.java	
+		- com.symantec.sam.actions.CommonAccountAction.convertToEncoding(UserAccount)
 		- com.symantec.sam.util.ProfileBroker.convertUserAccountToLdapProfile(UserAccount, LdapProfile)
+		- com.symantec.sam.delegates.CreateAccountDelegate.validate(LdapProfile, boolean)
+			- com.symantec.sam.interfacesImpl.WebServiceClientImpl.validateCreateProfile(LdapProfile, boolean)
+				- com.symantec.it.ValidationWebServiceImpl.validateCreateProfileForm(LdapProfile, boolean)
+					- com.symantec.uamCommon.validation.ValidationRules.validateCreateProfileForm(LdapProfile, boolean)
+						- com.symantec.uamCommon.validation.ValidationRules.validateProfileForm(LdapProfile, String[], boolean)
+							- com.symantec.uamCommon.validation.ValidationUtils.validateString(String, String)
+								- com.symantec.uamCommon.validation.ValidationUtils.validateString(String, String, boolean)
+		
+		
 	%NOTE : SAM Module has a seperate system to enroll a user which requires a more attention for UTF-8 changes
 		e.g. refer demouser1@symantec.com user's profile.
 		
@@ -108,12 +121,12 @@
 	1. first name, -
 	2. last name,  -
    *3. password,  - UTF-8 already but supporting printable ASCII only under SPECIAL_RULES_PASSWORD_COMPLEXITY
-	4. company name, -
+   *4. company name, - currenty doesn't throw any "...contains special caharaters..." error.//NEED TO CHECK refer:$1
 	5. address1, -
 	6. address2, -
 	7. address3, -
-	8. city, -
-	9. state  -
+    8. city, - 
+   ?9. state  - It comes through dropdown (always!?)
 
 - *Fields that are currently supports UTF-8 charset,
 	-	password
@@ -124,6 +137,9 @@
 	-	salutation
 	-	cn
 
+$1 : 	Currently Company Name doesn't throw any "...contains special caharaters..." error, but address filds does. 
+This field refers as a 'CustomerName' field, have to check whether this field nedds to change or not. 
+	
  
 愛佳愛子@gmail.com
 pswtest@symantec.com
