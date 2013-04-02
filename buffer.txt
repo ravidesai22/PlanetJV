@@ -56,21 +56,44 @@
 1. Enroll a user page.
 	-/symacctmgt/j2ee-apps/symacctmgt/web-app/createAccount/createAccount.jsp // User Management -> Enroll a user
 	-/symacctmgt/j2ee-apps/symacctmgt/src/com/symantec/sam/createAccount/actions/CreateAccountAction.java	
-		- com.symantec.sam.actions.CommonAccountAction.convertToEncoding(UserAccount)
-		- com.symantec.sam.util.ProfileBroker.convertUserAccountToLdapProfile(UserAccount, LdapProfile)
-		- com.symantec.sam.delegates.CreateAccountDelegate.validate(LdapProfile, boolean)
-			- com.symantec.sam.interfacesImpl.WebServiceClientImpl.validateCreateProfile(LdapProfile, boolean)
-				- com.symantec.it.ValidationWebServiceImpl.validateCreateProfileForm(LdapProfile, boolean)
-					- com.symantec.uamCommon.validation.ValidationRules.validateCreateProfileForm(LdapProfile, boolean)
-						- com.symantec.uamCommon.validation.ValidationRules.validateProfileForm(LdapProfile, String[], boolean)
-							- com.symantec.uamCommon.validation.ValidationUtils.validateString(String, String)
-								- com.symantec.uamCommon.validation.ValidationUtils.validateString(String, String, boolean)
+		-com.symantec.sam.actions.CommonAccountAction.convertToEncoding(UserAccount)
+		-com.symantec.sam.util.ProfileBroker.convertUserAccountToLdapProfile(UserAccount, LdapProfile)
+		-com.symantec.sam.delegates.CreateAccountDelegate.validate(LdapProfile, boolean)
+			-com.symantec.sam.interfacesImpl.WebServiceClientImpl.validateCreateProfile(LdapProfile, boolean)
+				-com.symantec.it.ValidationWebServiceImpl.validateCreateProfileForm(LdapProfile, boolean)
+					-com.symantec.uamCommon.validation.ValidationRules.validateCreateProfileForm(LdapProfile, boolean)
+						-com.symantec.uamCommon.validation.ValidationRules.validateProfileForm(LdapProfile, String[], boolean)
+							-com.symantec.uamCommon.validation.ValidationUtils.validateString(String, String)
+								-com.symantec.uamCommon.validation.ValidationUtils.validateString(String, String, boolean)
+									-com.symantec.uamCommon.validation.ValidationUtils.validateStringContent(String, int, int, String, String)
+										-com.symantec.uamCommon.validation.ValidationUtils.isWithinLatin1(String)
+											-com.symantec.uamCommon.validation.ValidationRules.validateProfileForm(LdapProfile, String[], boolean)
+												-com.symantec.uamCommon.validation.ValidationUtils.validateString(String, String)
+													-com.symantec.uamCommon.validation.ValidationUtils.validateString(String, String, boolean)
+														-com.symantec.uamCommon.validation.ValidationUtils.validateStringContent(String, int, int, String, String)
+														-com.symantec.uamCommon.validation.ValidationUtils.isWithinUTF8(String)
 		
 		
 	%NOTE : SAM Module has a seperate system to enroll a user which requires a more attention for UTF-8 changes
+		- It's using SymAccountWS for validation internally so I guess we don't require seperate code change as such,
+		only needs to change encoding at : *-com.symantec.sam.actions.CommonAccountAction.convertToEncoding(UserAccount)
 		e.g. refer demouser1@symantec.com user's profile.
 		
 2. Update a user page.
+	-/symacctmgt/j2ee-apps/symacctmgt/web-app/updateAccount/detail.jsp
+	-com.symantec.sam.updateAccount.actions.ProcessAction
+		-com.symantec.sam.updateAccount.actions.ExecuteUpdateAction
+  		   *-com.symantec.sam.actions.CommonAccountAction.convertToEncoding(UserAccount)
+			-com.symantec.sam.util.ProfileBroker.convertUserAccountToLdapProfile(UserAccount, LdapProfile)
+			-com.symantec.sam.updateAccount.actions.ExecuteUpdateAction.updateProfile(UserAccount, boolean, LdapProfile, IUpdateAccountDelegate, String)
+				-com.symantec.sam.delegates.UpdateAccountDelegate.updateProfile(String, LdapProfile, boolean, String)
+					-com.symantec.sam.interfacesImpl.WebServiceClientImpl.updateProfile(String, LdapProfile, boolean, String)
+						-com.symantec.it.ProfileWebServiceImpl.updateProfile(String, LdapProfile, boolean, String)
+							-com.symantec.uamCommon.webservices.profile.ProfileDeligateImpl.updateProfile(String, LdapProfile, boolean, String)
+								-com.symantec.uamCommon.validation.ValidationRules.validateUpdateProfileForm(LdapProfile, boolean, String)
+									-
+			
+			
 							
 * Useful links :
 ----------------------------
@@ -150,3 +173,72 @@ for password special rules validation:
 - com.symantec.uamCommon.password.PasswordFormatPolicy
 
 - com.symantec.uamCommon.password.PasswordValidatorTest
+
+
+* Milestones Dates	
+------------------------------
+Analysis and design complete	3/29/2013
+Dev complete	4/5/2013
+QA complete	4/26/2013
+UAT Complete	5/10/2013
+Go Live	6/5/2013
+
+------------------------------
+com.symantec.sam.actions.CommonAccountAction.convertToEncoding(UserAccount)
+
+if (userAccount.getLastName() != null)
+			userAccount.setLastName(new String(URLUtils.xssFilter(userAccount.getLastName()).trim()
+					.getBytes("ISO-8859-1"), "UTF-8"));
+
+String
+
+1. public String(byte[] bytes,Charset charset)
+Constructs a new String by decoding the specified array of bytes using the specified charset. 
+The length of the new String is a function of the charset, and hence may not be equal to the length of the byte array. 
+This method always replaces malformed-input and unmappable-character sequences with this charset's default replacement string. 
+The CharsetDecoder class should be used when more control over the decoding process is required. 
+
+Parameters:
+bytes - The bytes to be decoded into characters
+charset - The charset to be used to decode the bytes
+Since: 
+1.6 
+
+2. public String(byte[] bytes,String charsetName) throws UnsupportedEncodingException  //our code is using this...
+Constructs a new String by decoding the specified array of bytes using the specified charset. 
+The length of the new String is a function of the charset, and hence may not be equal to the length of the byte array. 
+The behavior of this constructor when the given bytes are not valid in the given charset is unspecified.
+The CharsetDecoder class should be used when more control over the decoding process is required. 
+
+
+Parameters:
+bytes - The bytes to be decoded into characters
+charsetName - The name of a supported charset 
+Throws: 
+UnsupportedEncodingException - If the named charset is not supported
+Since: 
+JDK1.1 
+
+
+
+Files that have this change :
+
+1. //depot/it_www/ebiz/EnterprisePortal/commons/3.0.2.1/MySymcUtils/j2ee-apps/MySymcUtils/src/com/symantec/utils/FormUtils.java
+2. //depot/it_www/ebiz/EnterprisePortal/mysymantec/3.0.2.1/buyingprogram/j2ee-apps/buyingprogram/src/com/symantec/iclick/create/actions/SetupContractRequestAction.java
+3. //depot/it_www/ebiz/EnterprisePortal/SymAccount/3.0.2.1/UAMCommon/config/common/ValidationRules.properties
+4. //depot/it_www/ebiz/EnterprisePortal/SymAccount/3.0.2.1/UAMCommon/src/com/symantec/uamCommon/validation/ValidationUtils.java
+5. //depot/it_www/ebiz/EnterprisePortal/SymAccount/3.0.2.1/UAMCommon/test/com/symantec/uamCommon/validation/ValidateUtilsTest.java
+6. //depot/it_www/ebiz/EnterprisePortal/mysymantec/3.0.2.1/buyingprogram/j2ee-apps/buyingprogram/web-app/iclick/createContract/newAgreement.jsp
+
+7. //depot/it_www/ebiz/EnterprisePortal/mysymantec/3.0.2.1/buyingprogram/j2ee-apps/buyingprogram/src/com/symantec/iclick/create/actions/CommonAction.java
+8. //depot/it_www/ebiz/EnterprisePortal/mysymantec/3.0.2.1/symacctmgt/j2ee-apps/symacctmgt/src/com/symantec/sam/actions/CommonAccountAction.java
+
+
+Doubts to be discussed with Prasanth B :
+- Do we need to change any validations rules as some field supports only Printable_ASCII
+- How can we test on other environments as MySymantec DEV is not working.
+- Fortify PCR is plaaning to go live in May end & we are also...
+- field "company name" is reffered as "customer name" in SAM... refer : $1
+- test cases/other documentations
+- CPOE weekly status meeting
+- we are only touching fields which are specified in 
