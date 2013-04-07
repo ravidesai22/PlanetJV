@@ -50,6 +50,7 @@
 	%NOTE : 
 		- Currently Company Name doesn't throw any "...contains special caharaters..." error, but address filds does.
 		- Try to find out where this class methoda are used, as it contains isWithinLatin method: com.symantec.portal.util.ValidationUtils
+			-com.symantec.portal.util.ValidationUtils.validateFirstName(ArrayList, String, String, int, ArrayList)
 
 
 #SAM module :
@@ -92,8 +93,16 @@
 							-com.symantec.uamCommon.webservices.profile.ProfileDeligateImpl.updateProfile(String, LdapProfile, boolean, String)
 								-com.symantec.uamCommon.validation.ValidationRules.validateUpdateProfileForm(LdapProfile, boolean, String)
 									-
-			
-			
+
+3. Genral flow of SAM :
+- symacctmgt/web-app/login/login.jsp
+- home.jsp
+	- ExecuteSearchAction.java //Search button
+		- results.jsp
+	- first update button on results.jsp 
+	-//depot/it_www/ebiz/EnterprisePortal/mysymantec/3.0.2.1/symacctmgt/j2ee-apps/symacctmgt/src/com/symantec/sam/login/actions/ExpandDetailsAction.java 
+		-//depot/it_www/ebiz/EnterprisePortal/mysymantec/3.0.2.1/symacctmgt/j2ee-apps/symacctmgt/src/com/symantec/sam/updateAccount/actions/ExpandDetailsAction.java
+	   - updateAccount/detail.jsp
 							
 * Useful links :
 ----------------------------
@@ -108,6 +117,7 @@
 	- http://www.columbia.edu/~fdc/utf8/
 	- http://www.cl.cam.ac.uk/~mgk25/ucs/examples/quickbrown.txt
 	- http://docwiki.cisco.com/wiki/Non-UTF-8_characters_needed_for_some_languages  // NON UTF-8 Characters
+	- http://www.columbia.edu/kermit/utf8-t1.html // All Unicode characters with it's UTF-8 encoding bytes
 	
 4. isWithinUTF8 code : http://www.coderanch.com/t/504267/java/java/validate-file-UTF-encoding
 
@@ -124,8 +134,11 @@
 - Test string : 
 		- Valid UTF : 愛佳愛子
 					    ઇનપુટ સાધનોને
+					    દેસાઇ 
+					  çéñþÿ
+					  Søren Kierkegård
 		
-		- Invalid UTF : çéñ			// Reference : http://docwiki.cisco.com/wiki/Non-UTF-8_characters_needed_for_some_languages
+		?- Invalid UTF : çéñ			// Reference : http://docwiki.cisco.com/wiki/Non-UTF-8_characters_needed_for_some_languages
 
 				
 - ç,é or ñ. 
@@ -149,7 +162,9 @@
 	6. address2, -
 	7. address3, -
     8. city, - 
-   ?9. state  - It comes through dropdown (always!?)
+   ?9. state  - It comes through dropdown (always!?)// On SAM->Enroll user page It's not having popupated from Dropdown.
+   
+  State/Province field is populated from the dropdown in Rewards Application & SAM (Except one page)
 
 - *Fields that are currently supports UTF-8 charset,
 	-	password
@@ -220,7 +235,7 @@ Since:
 JDK1.1 
 
 
-
+------------------------------
 Files that have this change :
 
 1. //depot/it_www/ebiz/EnterprisePortal/commons/3.0.2.1/MySymcUtils/j2ee-apps/MySymcUtils/src/com/symantec/utils/FormUtils.java
@@ -233,6 +248,8 @@ Files that have this change :
 7. //depot/it_www/ebiz/EnterprisePortal/mysymantec/3.0.2.1/buyingprogram/j2ee-apps/buyingprogram/src/com/symantec/iclick/create/actions/CommonAction.java
 8. //depot/it_www/ebiz/EnterprisePortal/mysymantec/3.0.2.1/symacctmgt/j2ee-apps/symacctmgt/src/com/symantec/sam/actions/CommonAccountAction.java
 
+?9. //depot/it_www/ebiz/EnterprisePortal/mysymantec/3.0.2.1/symacctmgt/j2ee-apps/symacctmgt/web-app/companyAssociation/index.jsp
+
 
 Doubts to be discussed with Prasanth B :
 - Do we need to change any validations rules as some field supports only Printable_ASCII
@@ -242,3 +259,134 @@ Doubts to be discussed with Prasanth B :
 - test cases/other documentations
 - CPOE weekly status meeting
 - we are only touching fields which are specified in 
+
+TO DO :
+------------------------------
+- Check this method : com.symantec.portal.util.FormUtils.isWithinLatin1(String)
+
+- You can refer this test method for testing non-utf-8 bytes : 
+	com.symantec.uamCommon.validation.ValidateUtilsTest.testIsWithinLatin1_not_latin_text()
+
+	
+	ValidationConstants.java:126:
+	ValidationUtils.java:710:
+	
+DEV TESTING :
+------------------------------
+
+# SymAccount :
+1. Register Now ://W
+	demouser1@symantec.com
+	password12
+	
+	It is storing values properly in DEV-LDAP
+	
+2. Update Now :
+
+# SAM :
+
+1. Update User : //W
+
+2. Enroll a user :
+	demouser2@symantec.com / password12 //W
+	first name : Søren
+	second name : Kierkegård
+	
+ISSUES :
+------------------------------
+
+- first name & last name not renderning properly on //depot/it_www/ebiz/EnterprisePortal/mysymantec/3.0.2.1/symacctmgt/j2ee-apps/symacctmgt/web-app/companyAssociation/index.jsp
+	
+	
+	https://licensingprograms-dev.symantec.com/symacctmgt/companyAssociation/UpadteEntryAction.do?uid=1500003107&useCasename=update&firstName=S%C3%B8ren&lastName=Kierkeg%C3%A5rd&updateAccountToken=
+
+<td>
+<a href="../companyAssociation/UpadteEntryAction.do?uid=<%=tempid%>&useCasename=<%=tempPage%>&firstName=<%=fname%>&lastName=<%=lname%>&updateAccountToken=<%=tokenid%>">
+	<div class="buttonLeft"></div>
+		<div class="button"><bean:message key="selfcare.button.addAgreements" /></div>
+	<div class="buttonRight"></div>
+</a>
+<br clear="all" />
+</td>	
+------------------------------------------------------------------------------------------------------------------
+Søren 
+Kierkegård
+
+<bean:define id="fname" name="helloForm" property="fname" />
+<bean:define id="sname" name="helloForm" property="sname" />
+<!-- 
+First Name : <%=fname%> 
+Second Name : <%=sname%>
+ -->
+<br>
+
+*First Name : <bean:write name="helloForm" property="fname" />
+*Second Name: <bean:write name="helloForm" property="sname" />
+
+
+<!-- 
+<a href="index.jsp?fanme=<%=fname%>&sname=<%=sname%>"><b>Check</b></a>
+<a href="index.jsp?fanme=<bean:write name="helloForm" property="fname" />&sname=<bean:write name="helloForm" property="sname" />"><b>Check2</b></a>
+ -->
+Check: 
+http://localhost:8181/Struts1POC/index.jsp?fanme=S%F8ren&sname=Kierkeg%E5rd
+
+Check1:
+http://localhost:8181/Struts1POC/index.jsp?fanme=S%F8ren&sname=Kierkeg%E5rd
+
+
+com.symantec.sam.companyAssociation.actions.EntryActionAction
+ Their first name 
+ 
+ 20382  2013-04-05 12:54:59,677 [INFO] com.symantec.servlets.AuthenticationFilter - Setting preferred language to ->> en
+ 
+ 1500003107 : uid of demouser2@symantec.com
+ 
+ IMP lines in log : 93,204,208,293
+
+last line of DEV log : 30872 
+last line of DEV log : 27233
+http://www.i18nguy.com/unicode-example.html
+
+http://symaccount-sbx.symantec.com/SymAccountWS/services/ProfileService?wsdl
+
+Expexted output : Søren Kierkegård
+What I am getting : SÃ¸ren KierkegÃ¥rd
+
+
+detail.jsp : C:\Oracle\Middleware\user_projects\domains\mysymantec_sbx\servers\D-225497-P12\tmp\_WL_user\MySymantecWSEar\nzy01h\war\updateAccount
+index.jsp : C:\Oracle\Middleware\user_projects\domains\mysymantec_sbx\servers\D-225497-P12\tmp\_WL_user\MySymantecWSEar\nzy01h\war\companyAssociation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------
+E-mail notifiactions :
+
+#SymAccount :
+1. Password Reset/Forgot Password //W
+-forgotpassword.jsp
+	-//depot/it_www/ebiz/EnterprisePortal/SymAccount/3.0.2.1/SymAccount/src/com/symantec/symaccount/actions/ProcessForgotPasswordAction.java
+		-com.symantec.uamCommon.webservices.profile.ProfileDeligateImpl.forgotYourPassword(String)
+			-com.symantec.uamCommon.notification.Notifications.PasswordRecoveryNotification(LdapProfile, String)
+	
+
+
+#Rewards :
+1. SAN Enrollment
+
+#SAM :
+
+?1. SAN related
