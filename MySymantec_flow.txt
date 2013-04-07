@@ -1,0 +1,100 @@
+* Rewards Applications tabs :
+
+1. When user clicks on MySymantec -> Rewards Agreements -> Query Agreement
+  https://licensingprograms-qa.symantec.com/buyingprogram/toModule.do?
+	prefix=/iclick/query
+	&page=/buyingprogram/query/initQuery.do
+	
+2. When user clicks on MySymantec -> Rewards Agreements -> Enroll
+	https://licensingprograms-qa.symantec.com/buyingprogram/toModule.do?
+	prefix=/iclick/createContract
+	&page=/buyingprogram/createContract/initCreate.do
+	
+3. When user clicks on MySymantec -> Rewards Agreements -> My Agreements
+	https://licensingprograms-qa.symantec.com/buyingprogram/toModule.do?
+	prefix=/iclick/manage
+	&page=/buyingprogram/manage/initManage.do
+	
+4. When user clicks on MySymantec -> Rewards Agreements -> Request Access
+	https://licensingprograms-qa.symantec.com/buyingprogram/toModule.do?
+	prefix=/iclick/selfAssociation
+	&page=/buyingprogram/selfAssociation/initSelfAssociation.do
+	
+5. When user clicks on MySymantec -> Rewards Agreements -> Manage Access
+	https://licensingprograms-qa.symantec.com/buyingprogram/toModule.do?
+	prefix=/iclick/users
+	&page=/buyingprogram/users/getSans.do
+	
+	
+-------------------------------------------------------------------------------------------------------------------------
+* Agreement Number: 0LNLKCREW 
+
+* Flow for MySymantec Rewards Agreements:
+
+	1. agreements_home.jsp
+	2. toModule
+	3. SwitchAction
+	4. InitQueryAction.java
+	5. /buyingprogram/j2ee-apps/buyingprogram/web-app/iclick/query/index.jsp
+	6. /buyingprogram/query/search in a struts-query.xml
+	7. /buyingprogram/j2ee-apps/buyingprogram/src/com/symantec/iclick/query/actions/SearchAction.java
+	8. com.symantec.iclick.cache.command.GetContractFromTibcoCommand.execute()
+	9. /buyingprogram/j2ee-apps/buyingprogram/src/com/symantec/iclick/cache/command/GetContractFromTibcoCommand.java
+			? CacheFactory.ensureCluster();
+			? cache = CacheFactory.getCache(IClickConstants.CACHE_TEMPLATE_CONTRACT_FROM_TIBCO);
+
+
+	
+* iclickQueryLCM
+
+* LCM: Local Customer Master, provides data replicated from the ERP to application queries
+
+
+* List of interfaces : 
+
+EAI interface details.
+
+1) ERPiClick > ERPContract 
+2) ERPiClick > ERPCreateProspect 
+3) iClick > iClick-Portal > iclick-ConvertContract > iClickConvert 
+4) iClick > iClick-Portal > iclick-CreateContract > iClickCreate 
+5) iClick > iClick-Portal > iclick-QueryLCM > iclickQueryLCM 
+6) webops > symErpCustomers
+7) symERP/SymErpTesting/SymERPCustomersTesting
+8) webops/BW_5.3_Projects/ERPCustomer/ADBERPCustomer 
+
+* Proucts & Maintenace tab gives "The feature you are trying to access is currently unavailable. Please try again later." error.
+	- CustomerPartnerAssetView webservice is used to fetch this records as per KT notes.
+-> Flow :
+-/MyProducts/WebRoot/productsLicenses.jsp
+-/productsLicensesInit
+-/MyProducts/src/com/symantec/myproducts/actions/ProductLicensesAction.java
+	-com.symantec.myproducts.actions.MyProductsCommonAction.getContractsForUser(String, int)
+
+
+-> Logs :
+1.
+2013-03-28 01:48:22,921 [ERROR] com.symantec.myproducts.delegate.MyProductsDelegateImpl - org.apache.axis2.AxisFaultConnection error
+2013-03-28 01:48:22,921 [INFO] symantec.myproducts.cache.command.GetProductFamilyCommand - GetProductFamily : Command Cache Exception = org.apache.axis2.AxisFaultConnection error
+2013-03-28 01:48:22,921 [INFO] com.symantec.myproducts.actions.ProductLicensesAction - ProductLicensesAction : GetProductFamilyCommand : Exception = com.symantec.myproducts.delegate.MyProductsDelegateException: org.apache.axis2.AxisFaultConnection error
+2013-03-28 01:48:22,921 [DEBUG] org.apache.struts.action.RequestProcessor - processForwardConfig(ForwardConfig[name=SUCCESS,path=/productsLicenses.jsp,redirect=false,contextRelative=true])
+userLocale:en
+Profile Not Emptyhttps://my-qa.symantec.com/webapp/cpoedevkit.do?mtab_01=prodMaint&st1=Products&st2=Maintenance+History&st3=Request+Access&st4=Manage+Access&st5=&sU1=%2FMyProducts%2FproductsLicensesInit.do&sU2=%2FMyProducts%2FproductSupportInit.do&sU3=%2Fbuyingprogram%2FtoModule.do%3Fprefix%3D%2Ficlick%2FselfAssociation%26page%3D%2Fbuyingprogram%2FselfAssociation%2FinitSelfAssociation.do&sU4=%2Fbuyingprogram%2FtoModule.do%3Fprefix%3D%2Ficlick%2Fusers%26page%3D%2Fbuyingprogram%2Fusers%2FgetSans.do&sU5=&locale=en&sselTab=Products&frstNm=Ravi&lastNm=Desai&cntrId=1&langId=en&impersonateMode=false
+2013-03-28 01:48:22,937 [DEBUG] org.apache.struts.util.PropertyMessageResources - getMessage(en,error.general)
+2013-03-28 01:48:22,937 [DEBUG] org.apache.struts.util.PropertyMessageResources - loadLocale(en)
+---------------------------------------------------------------------------------------------------------------------
+2.
+2013-03-28 01:54:10,594 [DEBUG] axiom.soap.impl.builder.StAXSOAPModelBuilder - Build the OMElelment faultstringBy the StaxSOAPModelBuilder
+2013-03-28 01:54:10,594 [DEBUG] axiom.om.impl.builder.StAXOMBuilder - END_ELEMENT: {http://schemas.xmlsoap.org/soap/envelope/}Fault:Fault
+2013-03-28 01:54:10,594 [ERROR] com.symantec.myproducts.delegate.MyProductsDelegateImpl - org.apache.axis2.AxisFaultConnection error
+2013-03-28 01:54:10,594 [INFO] symantec.myproducts.cache.command.GetProductFamilyCommand - GetProductFamily : Command Cache Exception = org.apache.axis2.AxisFaultConnection error
+2013-03-28 01:54:10,594 [INFO] com.symantec.myproducts.actions.ProductLicensesAction - ProductLicensesAction : GetProductFamilyCommand : Exception = com.symantec.myproducts.delegate.MyProductsDelegateException: org.apache.axis2.AxisFaultConnection error
+2013-03-28 01:54:10,594 [DEBUG] org.apache.struts.action.RequestProcessor - processForwardConfig(ForwardConfig[name=SUCCESS,path=/productsLicenses.jsp,redirect=false,contextRelative=true])
+userLocale:en
+Profile Not Emptyhttps://my-qa.symantec.com/webapp/cpoedevkit.do?mtab_01=prodMaint&st1=Products&st2=Maintenance+History&st3=Request+Access&st4=Manage+Access&st5=&sU1=%2FMyProducts%2FproductsLicensesInit.do&sU2=%2FMyProducts%2FproductSupportInit.do&sU3=%2Fbuyingprogram%2FtoModule.do%3Fprefix%3D%2Ficlick%2FselfAssociation%26page%3D%2Fbuyingprogram%2FselfAssociation%2FinitSelfAssociation.do&sU4=%2Fbuyingprogram%2FtoModule.do%3Fprefix%3D%2Ficlick%2Fusers%26page%3D%2Fbuyingprogram%2Fusers%2FgetSans.do&sU5=&locale=en&sselTab=Products&frstNm=Ravi&lastNm=Desai&cntrId=1&langId=en&impersonateMode=false
+2013-03-28 01:54:10,603 [DEBUG] org.apache.struts.util.PropertyMessageResources - getMessage(en,error.general)
+2013-03-28 01:54:10,603 [DEBUG] org.apache.struts.util.PropertyMessageResources - loadLocale(en)
+
+
+
+	
